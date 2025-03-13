@@ -1,0 +1,103 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TTStreamer.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:TTStreamer.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TTStreamer.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="TTStreamer">
+    <Window.Resources>
+        <converters:BytesToImageConverter x:Key="ToImageConverter"/>
+    </Window.Resources>
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+		<StackPanel>
+			<WrapPanel Margin="10"  Orientation="Horizontal">
+				<Label VerticalAlignment="Center" Content="Id пользователя без @:"/>
+				<TextBox Width="200" Margin="4 0 0 4" BorderThickness="1" BorderBrush="Black" Text="{Binding Path=UserId}">
+					<Interaction.Behaviors>
+						<DataTriggerBehavior Binding="{Binding Path=IsConnected}" Value="True">
+							<ChangePropertyAction PropertyName="BorderBrush">
+								<ChangePropertyAction.Value>
+									<SolidColorBrush Color="Green"/>
+								</ChangePropertyAction.Value>
+							</ChangePropertyAction>
+						</DataTriggerBehavior>
+
+						<DataTriggerBehavior Binding="{Binding Path=IsConnected}" Value="False">
+							<ChangePropertyAction PropertyName="BorderBrush">
+								<ChangePropertyAction.Value>
+									<SolidColorBrush Color="Red"/>
+								</ChangePropertyAction.Value>
+							</ChangePropertyAction>
+						</DataTriggerBehavior>
+					</Interaction.Behaviors>
+				</TextBox>
+				<Button  Margin="4 0 0 4" IsEnabled="{Binding Path=ConnectEnabled}" Command="{Binding Path=ConnectCommand}" Content="Подключиться"></Button>
+				<Button  Margin="4 0 0 4" IsEnabled="{Binding Path=DisconnectEnabled}" Command="{Binding Path=DisconnectCommand}" Content="Отключиться"></Button>
+				<Button  Click="ShowPopup"  Margin="4 0 0 4" Content="Редактировать привязку звуков"/>
+
+				<CheckBox  Margin="4 0 0 4" Content="Уведомление звкуом?" IsChecked="{Binding Path=Notification}"/>
+				<CheckBox  Margin="4 0 0 4" Content="Автопрокрутка?" IsChecked="{Binding Path=AutoScroll}"/>
+			</WrapPanel>
+			<WrapPanel Margin="10"  Orientation="Horizontal">
+				<Label VerticalAlignment="Center" Content="Голосовой движок:"/>
+				<ComboBox  Margin="4 0 0 4" SelectedItem="{Binding SpeechVoice}" Items="{Binding VoiceList}" Width="200" />
+				<Label  Margin="4 0 0 4" VerticalAlignment="Center" Content="Скорость произношения:"/>
+				<TextBox Margin="4 0 0 4" Text="{Binding SpeechRate}"></TextBox>
+				<CheckBox  Margin="4 0 0 4" Content="Озвучивать подарки?" IsChecked="{Binding Path=SpeechGift}"/>
+				<CheckBox  Margin="4 0 0 4" Content="Озвучивать лайки?" IsChecked="{Binding Path=SpeechLike}"/>
+				<CheckBox  Margin="4 0 0 4" Content="Озвучивать подключения?" IsChecked="{Binding Path=SpeechMember}"/>
+			</WrapPanel>
+
+		</StackPanel>
+        <ScrollViewer x:Name="giftsSV" Grid.Row="1">
+            <ItemsControl PropertyChanged="AvaloniaObject_OnPropertyChanged" Items="{Binding Path=Gifts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" Spacing="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{Binding Path=Image, Converter={StaticResource ToImageConverter}}" Width="40" Height="40">
+                            </Image>
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Path=Text}"/>
+                            
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding Path=RepeatEnded}" Value="True">
+                                    <ChangePropertyAction PropertyName="Background">
+                                        <ChangePropertyAction.Value>
+                                            <SolidColorBrush Color="Transparent"/>
+                                        </ChangePropertyAction.Value>
+                                    </ChangePropertyAction>
+                                </DataTriggerBehavior>
+                    
+                                <DataTriggerBehavior Binding="{Binding Path=RepeatEnded}" Value="False">
+                                    <ChangePropertyAction PropertyName="Background">
+                                        <ChangePropertyAction.Value>
+                                            <SolidColorBrush Color="Salmon"/>
+                                        </ChangePropertyAction.Value>
+                                    </ChangePropertyAction>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+
+</Window>

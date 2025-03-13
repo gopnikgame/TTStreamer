@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+
+		<AssemblyVersion>1.0.*</AssemblyVersion>
+		<Version Condition="'$(RELEASE_VERSION)' != ''">$(RELEASE_VERSION)</Version>
+		<VersionPrefix Condition="'$(RELEASE_VERSION)' == ''">$([System.DateTime]::Now.ToString(`MMddHHmm`))</VersionPrefix>
+		<Deterministic>false</Deterministic>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
+        <Folder Include="Properties\PublishProfiles\" />
+        <None Remove=".gitignore" />
+    </ItemGroup>
+    <ItemGroup>
+		<PackageReference Include="Avalonia" Version="0.10.18" />
+		<PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
+		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
+		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.18" />
+	</ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\TTStreamer.Common\TTStreamer.Common.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Settings.Designer.cs">
+        <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Settings.settings</DependentUpon>
+      </Compile>
+      <Compile Update="Views\SoundsWindow.axaml.cs">
+        <DependentUpon>SoundsWindow.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <None Update="nlog.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Settings.settings">
+        <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        <Generator>SettingsSingleFileGenerator</Generator>
+      </None>
+    </ItemGroup>
+
+	<Target Name="ZipOutputPath" AfterTargets="Publish">
+		<ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(SolutionDir)\$(AssemblyName)_$(Version).zip" />
+	</Target>
+</Project>
